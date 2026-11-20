@@ -1,10 +1,11 @@
 import { SiteHeader } from '@/components/site-header'
 import { Hero } from '@/components/hero'
-import { StagesTimeline } from '@/components/sections/stages-timeline'
-import { BookReader } from '@/components/sections/book-reader'
+import { StagesReader } from '@/components/sections/stages-reader'
 import { Stories } from '@/components/sections/stories'
 import { MapsSection } from '@/components/sections/maps-section'
 import { MedicineMenu } from '@/components/sections/medicine-menu'
+import { LogoMark } from '@/components/brand/logo'
+import { StarPattern } from '@/components/brand/star-pattern'
 
 export default function Page() {
   return (
@@ -12,15 +13,19 @@ export default function Page() {
       <SiteHeader />
       <main>
         <Hero />
-        <StagesTimeline />
-        <BookReader />
+        <StagesReader />
         <Stories />
         <MapsSection />
         <MedicineMenu />
       </main>
-      <footer className="border-t border-border bg-primary px-4 py-10 text-center text-primary-foreground">
-        <p className="font-serif text-2xl">﴿لَقَدْ كَانَ لَكُمْ فِي رَسُولِ اللَّهِ أُسْوَةٌ حَسَنَةٌ﴾</p>
-        <p className="mt-3 text-sm text-primary-foreground/70">
+      <footer className="relative isolate overflow-hidden bg-primary px-4 py-12 text-center text-primary-foreground">
+        <StarPattern opacity={0.08} className="-z-10" />
+        <LogoMark tone="inverse" className="mx-auto mb-5 h-12 w-auto" />
+        <p className="font-quran text-2xl leading-loose md:text-3xl">
+          {'﴿لَّقَدْ كَانَ لَكُمْ فِي رَسُولِ اللَّهِ أُسْوَةٌ حَسَنَةٌ﴾'}
+        </p>
+        <p className="mt-1 text-xs text-gold-light">سورة الأحزاب: ٢١</p>
+        <p className="mt-5 text-sm text-primary-foreground/70">
           المحتوى ملخص من كتاب الرحيق المختوم للشيخ صفي الرحمن المباركفوري رحمه الله
         </p>
       </footer>

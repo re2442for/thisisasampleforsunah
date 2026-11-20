@@ -29,7 +29,7 @@ export function Stories() {
                 )}
               >
                 <span className={cn('mb-2 text-xs', showLessons ? 'text-accent' : 'text-accent')}>{story.stage}</span>
-                <h3 className="mb-3 font-serif text-2xl font-bold">{story.title}</h3>
+                <h3 className="mb-3 font-heading text-2xl font-extrabold">{story.title}</h3>
                 {showLessons ? (
                   <ul className="flex flex-1 flex-col gap-3">
                     {story.lessons.map((lesson) => (

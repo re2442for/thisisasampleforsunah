@@ -2,15 +2,34 @@
 
 import { useEffect } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { CircleMarker, MapContainer, Polyline, TileLayer, Tooltip, useMap } from 'react-leaflet'
-import { categoryColors, hijraRoute, type Place } from '@/lib/data/places'
+import L from 'leaflet'
+import { CircleMarker, MapContainer, Marker, Polyline, TileLayer, Tooltip, useMap } from 'react-leaflet'
+import { categoryColors, hijraRoute, historicalLabels, type Place } from '@/lib/data/places'
+
+export type Era = 'then' | 'now'
 
 type Props = {
   places: Place[]
   selectedId: string | null
   showHijra: boolean
+  era: Era
   focus: { center: [number, number]; zoom: number }
   onSelect: (id: string) => void
+}
+
+const HISTORICAL_MAX_ZOOM = 14
+
+const tiles: Record<Era, { url: string; attribution: string; maxNativeZoom: number }> = {
+  now: {
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxNativeZoom: 19,
+  },
+  then: {
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri',
+    maxNativeZoom: 13,
+  },
 }
 
 function FlyTo({ center, zoom }: { center: [number, number]; zoom: number }) {
@@ -21,33 +40,44 @@ function FlyTo({ center, zoom }: { center: [number, number]; zoom: number }) {
   return null
 }
 
-export default function SiraMap({ places, selectedId, showHijra, focus, onSelect }: Props) {
+export default function SiraMap({ places, selectedId, showHijra, era, focus, onSelect }: Props) {
+  const zoom = era === 'then' ? Math.min(focus.zoom, HISTORICAL_MAX_ZOOM) : focus.zoom
+  const tile = tiles[era]
+  const routeColor = era === 'then' ? '#7a4f1d' : '#b48a3c'
+
   return (
-    <MapContainer
-      center={focus.center}
-      zoom={focus.zoom}
-      scrollWheelZoom={false}
-      className="size-full"
-      attributionControl
-    >
+    <MapContainer center={focus.center} zoom={zoom} scrollWheelZoom={false} className="size-full" attributionControl>
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        key={era}
+        attribution={tile.attribution}
+        url={tile.url}
+        maxNativeZoom={tile.maxNativeZoom}
+        maxZoom={era === 'then' ? HISTORICAL_MAX_ZOOM : 19}
       />
-      <FlyTo center={focus.center} zoom={focus.zoom} />
+      <FlyTo center={focus.center} zoom={zoom} />
+
+      {era === 'then' &&
+        historicalLabels.map((label) => (
+          <Marker
+            key={label.name}
+            position={label.coords}
+            interactive={false}
+            icon={L.divIcon({ className: 'map-era-label', html: label.name, iconSize: undefined })}
+          />
+        ))}
 
       {showHijra && (
         <>
           <Polyline
             positions={hijraRoute.map((s) => s.coords)}
-            pathOptions={{ color: '#b8862b', weight: 4, dashArray: '8 8' }}
+            pathOptions={{ color: routeColor, weight: 4, dashArray: '8 8' }}
           />
           {hijraRoute.map((stop) => (
             <CircleMarker
               key={stop.name}
               center={stop.coords}
               radius={4}
-              pathOptions={{ color: '#b8862b', fillColor: '#fdfaf4', fillOpacity: 1, weight: 2 }}
+              pathOptions={{ color: routeColor, fillColor: '#fbf8f1', fillOpacity: 1, weight: 2 }}
             >
               <Tooltip direction="top">{stop.name}</Tooltip>
             </CircleMarker>
@@ -59,11 +89,11 @@ export default function SiraMap({ places, selectedId, showHijra, focus, onSelect
         const isSelected = place.id === selectedId
         return (
           <CircleMarker
-            key={place.id}
+            key={`${era}-${place.id}`}
             center={place.coords}
             radius={isSelected ? 11 : 7}
             pathOptions={{
-              color: '#fdfaf4',
+              color: era === 'then' ? '#f3e7cc' : '#fbf8f1',
               weight: 2,
               fillColor: categoryColors[place.category],
               fillOpacity: 0.95,
@@ -71,7 +101,7 @@ export default function SiraMap({ places, selectedId, showHijra, focus, onSelect
             eventHandlers={{ click: () => onSelect(place.id) }}
           >
             <Tooltip direction="top" permanent={isSelected}>
-              {place.name}
+              {era === 'then' ? (place.oldName ?? place.name) : place.name}
             </Tooltip>
           </CircleMarker>
         )

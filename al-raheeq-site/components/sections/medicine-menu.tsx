@@ -37,7 +37,7 @@ export function MedicineMenu() {
                 </div>
                 <div className="flex items-center justify-between gap-3 p-4">
                   <div>
-                    <h3 className="font-serif text-2xl font-bold text-primary">{food.name}</h3>
+                    <h3 className="font-heading text-2xl font-extrabold text-primary">{food.name}</h3>
                     <p className="text-sm text-muted-foreground">{food.tagline}</p>
                   </div>
                   <span className="shrink-0 rounded-full bg-secondary px-3 py-1 text-xs text-primary">التفاصيل</span>
@@ -72,7 +72,7 @@ export function MedicineMenu() {
                 </div>
                 <div className="flex flex-col gap-5 p-6 md:p-8">
                   <div>
-                    <DialogPrimitive.Title className="font-serif text-3xl font-bold text-primary">
+                    <DialogPrimitive.Title className="font-heading text-3xl font-extrabold text-primary">
                       {selected.name}
                     </DialogPrimitive.Title>
                     <DialogPrimitive.Description className="text-muted-foreground">
